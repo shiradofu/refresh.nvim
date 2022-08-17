@@ -2,10 +2,7 @@
 
 REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"
 SERVER="$REPO_ROOT/server.sh"
-
-stop() {
-  pkill -9 -f "$SERVER"
-}
+stop() { pkill -9 -f "$SERVER"; }
 
 if [ "$1" = 'restart' ]; then
   stop

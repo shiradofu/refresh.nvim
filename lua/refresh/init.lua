@@ -5,9 +5,7 @@ local util = require 'refresh.util'
 local R = {}
 R._registered = {}
 
-local function iso8601utc()
-  return os.date '!%Y-%m-%dT%TZ'
-end
+local function iso8601utc() return os.date '!%Y-%m-%dT%TZ' end
 
 ---@class Refresh.RegisterConfigPull
 ---@field silent boolean
@@ -32,6 +30,10 @@ function R.register(dir, config)
     util.err("'%s' is not a directory.", dir)
     return false
   end
+  if vim.fn.isdirectory(dir .. '/.git') == 0 then
+    util.err("'%s' msut be a git repository.", dir)
+    return false
+  end
   if config.delete_empty and not config.delete_empty.files then
     util.err 'config.delete_empty.files required.'
     return false
@@ -41,9 +43,7 @@ function R.register(dir, config)
       util.err 'config.push.files required.'
       return false
     end
-    if not config.push.commit_msg then
-      config.push.commit_msg = iso8601utc
-    end
+    if not config.push.commit_msg then config.push.commit_msg = iso8601utc end
   end
 
   local augroup =
@@ -54,9 +54,7 @@ function R.register(dir, config)
     vim.api.nvim_create_autocmd('BufWinEnter', {
       group = augroup,
       pattern = pattern,
-      callback = function()
-        R.pull(dir, config.branch, config.pull.silent)
-      end,
+      callback = function() R.pull(dir, config.branch, config.pull.silent) end,
       once = true,
     })
   end
