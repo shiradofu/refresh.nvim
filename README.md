@@ -75,45 +75,28 @@ refresh.register('/some/dir', {
   },
   delete_empty = {
     -- Files included this will be deleted before auto-push if they are empty.
-    -- If '*' is specified, all empty files under the direcotry will be deleted.
     -- File path can be relative to the registered dir.
+    -- { '*' } means all files under the direcotry.
+    -- 'SESSION' mesans files opened during the current session.
     files = { 'my-note.md' },
+    -- files = { '*' },
+    -- files = 'SESSION',
   },
   push = {
     -- Files included this will be git added, commited and pushed on ExitPre.
-    -- If '*' is specified, all files in the repository is added.
     -- File path can be relative to the registered dir.
-    files = { '*' }
+    -- { '*' } means all files in the repository.
+    -- 'SESSION' mesans files opened during the current session.
+    files = { '*' },
     -- This return value is used as a commit message.
     -- This is optional. If omitted, ISO 8601 UTC datetime will be used.
     commit_msg = function()
       return os.date '!%Y-%m-%dT%TZ'
-    end
+    end,
   },
   -- This is an option to avoid polluting your github contributions.
   -- Default is set to nil, and simply skip the branch validation.
-  branch = 'main'
-})
-```
-
-You can dinamically change files to push or delete, too. For example, if you'd
-like to push only the files you've opened in the current session, this should
-work well:
-
-```lua
-local dir = '/some/dir'
-local config = { push = { enabled = true, files = {} } }
-R.register(dir, config)
-
-local group = vim.api.nvim_create_augroup('RefreshAdd', {})
-vim.api.nvim_create_autocmd('BufWinEnter', {
-  group = group,
-  pattern = dir .. '/*',
-  callback = function(e)
-    if not vim.tbl_contains(config.push.files, e.file) then
-      table.insert(config.push.files, e.file)
-    end
-  end,
+  branch = 'main',
 })
 ```
 

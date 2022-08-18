@@ -11,10 +11,10 @@ local function iso8601utc() return os.date '!%Y-%m-%dT%TZ' end
 ---@field silent boolean
 
 ---@class Refresh.RegisterConfigDeleteEmpty
----@field files string[]
+---@field files string[]|'SESSION'
 
 ---@class Refresh.RegisterConfigPush
----@field files string[]
+---@field files string[]|'SESSION'
 ---@field commit_msg fun(): string
 
 ---@class Refresh.RegisterConfig
@@ -34,26 +34,38 @@ function R.register(dir, config)
     util.err("'%s' msut be a git repository.", dir)
     return false
   end
-  if config.delete_empty and not config.delete_empty.files then
-    util.err 'config.delete_empty.files required.'
-    return false
+  local session_delete_empty = false
+  if config.delete_empty then
+    if not config.delete_empty.files then
+      util.err 'config.delete_empty.files required.'
+      return false
+    end
+    if config.delete_empty.files == 'SESSION' then
+      config.delete_empty.files = {}
+      session_delete_empty = true
+    end
   end
+  local session_push = false
   if config.push then
     if not config.push.files then
       util.err 'config.push.files required.'
       return false
+    end
+    if config.push.files == 'SESSION' then
+      config.push.files = {}
+      session_push = true
     end
     if not config.push.commit_msg then config.push.commit_msg = iso8601utc end
   end
 
   local augroup =
     vim.api.nvim_create_augroup('Refresh' .. dir:gsub('/', '_'), {})
+  local dir_pattern = (vim.endswith(dir, '/') and dir or dir .. '/') .. '*'
 
   if config.pull then
-    local pattern = (vim.endswith(dir, '/') and dir or dir .. '/') .. '*'
     vim.api.nvim_create_autocmd('BufWinEnter', {
       group = augroup,
-      pattern = pattern,
+      pattern = dir_pattern,
       callback = function() R.pull(dir, config.branch, config.pull.silent) end,
       once = true,
     })
@@ -81,6 +93,30 @@ function R.register(dir, config)
           })
         end
         server.send(builder)
+      end,
+    })
+  end
+
+  if session_delete_empty then
+    vim.api.nvim_create_autocmd('BufWinEnter', {
+      group = augroup,
+      pattern = dir_pattern,
+      callback = function(e)
+        if not vim.tbl_contains(config.delete_empty.files, e.file) then
+          table.insert(config.delete_empty.files, e.file)
+        end
+      end,
+    })
+  end
+
+  if session_push then
+    vim.api.nvim_create_autocmd('BufWinEnter', {
+      group = augroup,
+      pattern = dir_pattern,
+      callback = function(e)
+        if not vim.tbl_contains(config.push.files, e.file) then
+          table.insert(config.push.files, e.file)
+        end
       end,
     })
   end
