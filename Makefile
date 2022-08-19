@@ -7,6 +7,12 @@ nvim: deps
 	@# Update exit status to refllect test results
 	@FAILED=$$(tail -n 1 $(TEMPFILE) | grep 'Tests Failed'); rm -f $(TEMPFILE); [ -z "$$FAILED" ]
 
+# ex. make command.nvim
+%.nvim:
+	@nvim --headless --noplugin -u tests/init.vim -c "PlenaryBustedFile tests/*$**" -c 'q' | tee $(TEMPFILE)
+	@# Update exit status to refllect test results
+	@FAILED=$$(tail -n 1 $(TEMPFILE) | grep 'Tests Failed'); rm -f $(TEMPFILE); [ -z "$$FAILED" ]
+
 deps:
 	@mkdir -p vendor
 ifeq (,$(wildcard ./vendor/plenary.nvim))
