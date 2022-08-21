@@ -36,8 +36,8 @@ I take personal notes related to my project with neovim, but it's in a different
 repository from the project. So I have to run git add, commit, and push in both
 repository, and it's a drag and forgettable.
 
-This plugin watch a directory, and automatically run `git pull` and
-`add`/`commit`/`push`. Additionally, it provides a removing empty files/dirs
+This plugin registers `git pull` and `add`/`commit`/`push` for vim autocommands
+`BufWinEnter` and `ExitPre`. Additionally, it provides removing empty files/dirs
 option so as not to mess up the notes repository, or a branch validation option
 not to pollute your github contributions graph.
 
@@ -99,7 +99,7 @@ refresh.register('/some/dir', {
   },
   -- This is an option to avoid polluting your github contributions.
   -- Default is set to nil, and simply skip the branch validation.
-  branch = 'main',
+  branch = 'non-default',
 })
 ```
 
