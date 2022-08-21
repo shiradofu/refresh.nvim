@@ -26,6 +26,7 @@ local function iso8601utc() return os.date '!%Y-%m-%dT%TZ' end
 ---@param dir string
 ---@param config Refresh.RegisterConfig
 function R.register(dir, config)
+  dir = vim.endswith(dir, '/') and dir:sub(1, -2) or dir
   if vim.fn.isdirectory(dir) == 0 then
     util.err("'%s' is not a directory.", dir)
     return false
@@ -58,9 +59,8 @@ function R.register(dir, config)
     if not config.push.commit_msg then config.push.commit_msg = iso8601utc end
   end
 
-  local augroup =
-    vim.api.nvim_create_augroup('Refresh' .. dir:gsub('/', '_'), {})
-  local dir_pattern = (vim.endswith(dir, '/') and dir or dir .. '/') .. '*'
+  local augroup = vim.api.nvim_create_augroup('Refresh:' .. dir, {})
+  local dir_pattern = dir .. '/*'
 
   if config.pull then
     vim.api.nvim_create_autocmd('BufWinEnter', {
@@ -79,7 +79,7 @@ function R.register(dir, config)
       callback = function()
         local builder = command()
         builder.dir = dir
-        builder.branch = config.branch
+        builder.branch = config.branch or ''
         if config.delete_empty then
           table.insert(builder.tasks, {
             name = 'delete_empty',
@@ -128,6 +128,7 @@ end
 ---@param dir string|nil
 function R.status(dir)
   if dir then
+    dir = vim.endswith(dir, '/') and dir:sub(1, -2) or dir
     vim.pretty_print(R._registered[dir])
   else
     vim.pretty_print(R._registered)
