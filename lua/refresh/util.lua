@@ -6,12 +6,8 @@ function U.echo(chunk)
   vim.api.nvim_echo(chunk, true, {})
 end
 
-function U.msg(msg, ...)
-  U.echo { { msg:format(...), 'None' } }
-end
+function U.msg(msg, ...) U.echo { { msg:format(...), 'None' } } end
 
-function U.err(msg, ...)
-  U.echo { { msg:format(...), 'ErrorMsg' } }
-end
+function U.err(msg, ...) U.echo { { msg:format(...), 'ErrorMsg' } } end
 
 return U
