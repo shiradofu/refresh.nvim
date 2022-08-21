@@ -43,7 +43,10 @@ not to pollute your github contributions graph.
 
 ## 🍀 Installation
 
-[plenary.nvim](https://github.com/nvim-lua/plenary.nvim) is required.
+**requirements**
+
+- neovim 0.7+
+- [plenary.nvim](https://github.com/nvim-lua/plenary.nvim)
 
 with [packer.nvim](https://github.com/wbthomason/packer.nvim):
 
@@ -141,7 +144,7 @@ refresh.status() --> prints all registered configs
 ## 🍏 Integration
 
 Originally, I develop this for
-[lightnote.nvim](https://github.com/shiradofu/lightnote.nvim). (In fact, I was
+[door2note.nvim](https://github.com/shiradofu/door2note.nvim). (In fact, I was
 creating single plugin which has these two features.) But I think this could be
 used with other plugins or tools, such as:
 
