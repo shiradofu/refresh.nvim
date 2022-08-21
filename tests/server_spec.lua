@@ -1,11 +1,24 @@
 local command = require 'refresh.command'
 local server = require 'refresh.server'
+local _stub = require 'luassert.stub'
+local match = require 'luassert.match'
+
+local stubs = {}
+local function stub(...)
+  local s = _stub(...)
+  table.insert(stubs, s)
+  return s
+end
+local function revert_mocks()
+  for _, fn in ipairs(stubs) do
+    fn:revert()
+  end
+  stubs = {}
+end
 
 describe('refresh.server', function()
-  it('should send', function()
-    local orig_jobstart = vim.fn.jobstart
-    local jobstart_cmd = nil
-    vim.fn.jobstart = function(cmd, _) jobstart_cmd = cmd end
+  it('should send correctly', function()
+    local jobstart = stub(vim.fn, 'jobstart')
 
     local builder = command()
     builder.dir = '/some/dir'
@@ -19,17 +32,12 @@ describe('refresh.server', function()
 
     server.send(builder)
 
-    assert.True(vim.startswith(
-      jobstart_cmd,
-      [[echo "/some/dir
+    assert.stub(jobstart).called_with([[echo "/some/dir
 main
 push
 \"double quote should be escaped\"
 *
 
-" >]]
-    ))
-
-    vim.fn.jobstart = orig_jobstart
+" > ]] .. vim.fn.stdpath 'data' .. '/fresh/fifo', match._)
   end)
 end)
