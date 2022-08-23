@@ -1,6 +1,7 @@
 local command = require 'refresh.command'
 local server = require 'refresh.server'
 local util = require 'refresh.util'
+local git = require 'refresh.git'
 
 local R = {}
 R._registered = {}
@@ -66,7 +67,7 @@ function R.register(dir, config)
     vim.api.nvim_create_autocmd('BufWinEnter', {
       group = augroup,
       pattern = dir_pattern,
-      callback = function() R.pull(dir, config.branch, config.pull.silent) end,
+      callback = function(a) git.pull(a.buf, dir, config.branch, config.pull.silent) end,
       once = true,
     })
   end

@@ -1,6 +1,7 @@
 local refresh = require 'refresh'
 local server = require 'refresh.server'
 local util = require 'refresh.util'
+local git = require 'refresh.git'
 local Job = require 'plenary.job'
 local _stub = require 'luassert.stub'
 local _spy = require 'luassert.spy'
@@ -52,10 +53,14 @@ describe('refresh.register', function()
 
   it('should set pull autocmd when enabled', function()
     assert.True(refresh.register(testdir, { pull = {} }))
-    assert.equals(
-      1,
-      #vim.api.nvim_get_autocmds { group = augroup, event = 'BufWinEnter' }
-    )
+    local autocmds =
+      vim.api.nvim_get_autocmds { group = augroup, event = 'BufWinEnter' }
+    assert.equals(1, #autocmds)
+
+    local pull = mock(true, git, 'pull')
+    vim.api.nvim_exec_autocmds('BufWinEnter', { pattern = testdir .. '/*' })
+
+    assert.stub(pull).called(1)
   end)
 
   it('should cause an error if files is nil', function()
