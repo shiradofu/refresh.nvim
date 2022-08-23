@@ -2,7 +2,7 @@ require 'refresh.command'
 
 local script_dir = debug.getinfo(1).source:match '@?(.*/)'
 local repo_root = vim.loop.fs_realpath(script_dir .. '/../../')
-local exe = repo_root .. '/server.sh'
+local exe = repo_root .. '/refresh.sh'
 local fifo = vim.fn.stdpath 'data' .. '/fresh/fifo'
 
 ---@class Refresh.Server

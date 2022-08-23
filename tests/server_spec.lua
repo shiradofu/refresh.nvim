@@ -17,7 +17,21 @@ local function revert_mocks()
 end
 
 describe('refresh.server', function()
-  it('should send correctly', function()
+  before_each(function() revert_mocks() end)
+
+  it('ensure_launch', function()
+    local jobstart = stub(vim.fn, 'jobstart')
+    server.ensure_launch()
+
+    assert
+      .stub(jobstart)
+      .called_with(match.has_match '/refresh.nvim/refresh.sh')
+    assert
+      .stub(jobstart)
+      .called_with(match.has_match(vim.fn.stdpath 'data' .. '/fresh/fifo'))
+  end)
+
+  it('send', function()
     local jobstart = stub(vim.fn, 'jobstart')
 
     local builder = command()

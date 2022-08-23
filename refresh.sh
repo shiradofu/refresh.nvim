@@ -1,9 +1,10 @@
 #!/bin/bash
 
 REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"
-SERVER="$REPO_ROOT/server.sh"
+SERVER="$REPO_ROOT/refresh.sh"
 
 process() {
+  log info "data: $data"
   i=1
   get() { echo "$data" | cut -d$'\n' -f$i; }
 
