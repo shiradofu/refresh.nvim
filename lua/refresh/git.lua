@@ -7,6 +7,7 @@ local G = {}
 ---@param branch string
 ---@return boolean
 local function validate_branch(dir, branch)
+  if not branch then return true end
   local current = Job:new({
     command = 'git',
     args = { 'rev-parse', '--abbrev-ref', 'HEAD' },
