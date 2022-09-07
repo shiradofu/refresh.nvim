@@ -123,7 +123,7 @@ main() {
 case "$1" in
   restart )
     stop
-    nohup "$ SERVER" >/dev/null 2>&1 &
+    nohup "$SERVER" >/dev/null 2>&1 &
     exit
     ;;
   stop )
